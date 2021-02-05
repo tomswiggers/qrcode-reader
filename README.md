@@ -3,11 +3,19 @@
 ## Compile
 
 ```
-go build read-qrcode.go
+go build qrcode_reader.go
 ```
 
 ## Execute
 
 ```
-sudo ./read-qrcode --inputDevice=/dev/input/event17
+sudo ./qrcode_reader --inputDevice=/dev/input/event17
 ```
+
+## Testing
+
+```
+go test -cover -v
+```
+
+
