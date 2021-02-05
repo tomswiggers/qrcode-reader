@@ -6,25 +6,31 @@ import (
 )
 
 func TestGetDigit(t *testing.T) {
-
-  if getDigit(evdev.KEY_1) != 1 {
-    t.Fail()
-  }
+  if getDigit(evdev.KEY_1) != 1 { t.Fail() }
 }
 
-func TestisKeyDownEvent(t *testing.T) {
+func TestIsKeyDownEvent(t *testing.T) {
+  if !isKeyDownEvent(evdev.EV_KEY, 0) { t.Fail() }
 }
 
-func TestisKeyEventNumeric(t *testing.T) {
+func TestIsKeyEventNumeric(t *testing.T) {
+  if !isKeyEventNumeric(evdev.KEY_1) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_2) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_3) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_4) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_5) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_6) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_7) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_8) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_9) { t.Fail() }
+  if !isKeyEventNumeric(evdev.KEY_0) { t.Fail() }
 }
 
 func TestAddDigit(t *testing.T) {
-
   var code *uint64
 
-  if *addDigit(code, 1) != 1 {
-    t.Fail()
-  }
-
+  code = addDigit(code, 1)
+  if *code != 1 { t.Fail() }
+  if *addDigit(code, 1) != 11 { t.Fail() }
 }
 
