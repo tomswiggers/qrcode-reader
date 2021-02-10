@@ -6,9 +6,9 @@ import (
   "net/http"
   "log"
 	"os"
-
 	evdev "github.com/gvalkov/golang-evdev"
 )
+
 
 func isKeyDownEvent(eventType uint16, eventValue int32) bool {
   if eventType == evdev.EV_KEY && eventValue == 0 {
@@ -55,25 +55,36 @@ func addDigit(code *uint64, digit uint64) *uint64 {
   return code
 }
 
-func isValidationNeeded(validationUrl string) bool {
-  if validationUrl == "" {
+type Validator interface {
+  isValidationNeeded(validationUrl string) bool
+  getValidationLink(validationUrl string, code uint64) string
+  validateQrCode(validationUrl string, code uint64) bool
+}
+
+type ValidatorData struct {
+  validationUrl string
+  code uint64
+}
+
+func (d ValidatorData) isValidationNeeded() bool {
+  if d.validationUrl == "" {
     return false
   }
 
   return true
 }
 
-func getValidationLink(validationUrl string, code *uint64) string {
+func (d ValidatorData) getValidationLink(validationUrl string, code *uint64) string {
   return fmt.Sprintf("%s/%d", validationUrl, *code)
 }
 
-func validateQrCode(validationUrl string, code *uint64) bool {
-  if !isValidationNeeded(validationUrl) {
+func (d ValidatorData) validateQrCode(validationUrl string, code *uint64) bool {
+  if !d.isValidationNeeded() {
     fmt.Println("No validation needed")
     return false
   }
 
-  validationUrl = getValidationLink(validationUrl, code)
+  validationUrl = d.getValidationLink(validationUrl, code)
   resp, err := http.Get(validationUrl)
 
   if err != nil {
@@ -122,7 +133,8 @@ func main() {
 
         if event.Code == evdev.KEY_ENTER {
           fmt.Printf("QR code is complete: %d\n", *code)
-          validateQrCode(*validationUrl, code)
+          validator := ValidatorData{validationUrl: *validationUrl, code: *code}
+          validator.validateQrCode(*validationUrl, code)
           code = nil
         }
       }
