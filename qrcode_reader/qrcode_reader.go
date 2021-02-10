@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
   "flag"
+  "net/http"
+  "log"
 	"os"
 
 	evdev "github.com/gvalkov/golang-evdev"
@@ -53,9 +55,41 @@ func addDigit(code *uint64, digit uint64) *uint64 {
   return code
 }
 
+func isValidationNeeded(validationUrl string) bool {
+  if validationUrl == "" {
+    return false
+  }
+
+  return true
+}
+
+func getValidationLink(validationUrl string, code *uint64) string {
+  return fmt.Sprintf("%s/%d", validationUrl, *code)
+}
+
+func validateQrCode(validationUrl string, code *uint64) bool {
+  if !isValidationNeeded(validationUrl) {
+    fmt.Println("No validation needed")
+    return false
+  }
+
+  validationUrl = getValidationLink(validationUrl, code)
+  resp, err := http.Get(validationUrl)
+
+  if err != nil {
+    log.Fatal(err)
+  }
+
+  defer resp.Body.Close()
+
+  return true
+}
+
 func main() {
   path := flag.String("inputDevice", "/dev/input/event14", "The input device") 
+  validationUrl := flag.String("validationUrl", "", "Validation url when QR code is scanned") 
   flag.Parse()
+
   var code *uint64
   var key uint64
 
@@ -88,6 +122,7 @@ func main() {
 
         if event.Code == evdev.KEY_ENTER {
           fmt.Printf("QR code is complete: %d\n", *code)
+          validateQrCode(*validationUrl, code)
           code = nil
         }
       }

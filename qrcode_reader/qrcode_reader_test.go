@@ -34,3 +34,11 @@ func TestAddDigit(t *testing.T) {
   if *addDigit(code, 1) != 11 { t.Fail() }
 }
 
+func TestIsValidationNeeded(t *testing.T) {
+  if isValidationNeeded("") { t.Fail() }
+}
+
+func TestGetValidationLink(t *testing.T) {
+  var code *uint64 = func(val uint64) *uint64 { return &val }(12345)
+  if getValidationLink("url", code) != "url/12345" { t.Fail() }
+}
