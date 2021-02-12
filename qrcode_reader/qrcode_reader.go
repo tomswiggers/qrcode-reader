@@ -9,6 +9,12 @@ import (
 	evdev "github.com/gvalkov/golang-evdev"
 )
 
+type QrCodeReader interface {
+  isKeyDownEvent(eventType uint16, eventValue int32) bool
+  isKeyEventNumeric(code uint16) bool
+  getDigit(code uint16) uint64
+  addDigit(code *uint64, digit uint64) *uint64
+}
 
 func isKeyDownEvent(eventType uint16, eventValue int32) bool {
   if eventType == evdev.EV_KEY && eventValue == 0 {
@@ -55,10 +61,10 @@ func addDigit(code *uint64, digit uint64) *uint64 {
   return code
 }
 
-type Validator interface {
+type Validater interface {
   isValidationNeeded(validationUrl string) bool
-  getValidationLink(validationUrl string, code uint64) string
-  validateQrCode(validationUrl string, code uint64) bool
+  getValidationLink(validationUrl string, code *uint64) string
+  validateQrCode(validationUrl string, code *uint64) bool
 }
 
 type ValidatorData struct {
@@ -66,8 +72,8 @@ type ValidatorData struct {
   code uint64
 }
 
-func (d ValidatorData) isValidationNeeded() bool {
-  if d.validationUrl == "" {
+func (d ValidatorData) isValidationNeeded(validationUrl string) bool {
+  if validationUrl == "" {
     return false
   }
 
@@ -79,11 +85,7 @@ func (d ValidatorData) getValidationLink(validationUrl string, code *uint64) str
 }
 
 func (d ValidatorData) validateQrCode(validationUrl string, code *uint64) bool {
-  if !d.isValidationNeeded() {
-    fmt.Println("No validation needed")
-    return false
-  }
-
+  fmt.Printf("validate qr code\n")
   validationUrl = d.getValidationLink(validationUrl, code)
   resp, err := http.Get(validationUrl)
 
@@ -97,12 +99,13 @@ func (d ValidatorData) validateQrCode(validationUrl string, code *uint64) bool {
 }
 
 func main() {
-  path := flag.String("inputDevice", "/dev/input/event14", "The input device") 
-  validationUrl := flag.String("validationUrl", "", "Validation url when QR code is scanned") 
+  path := flag.String("inputDevice", "/dev/input/event14", "The input device")
+  validationUrl := flag.String("validationUrl", "", "Validation url when QR code is scanned")
   flag.Parse()
 
   var code *uint64
   var key uint64
+  var validator Validater
 
 	if !evdev.IsInputDevice(*path) {
 		os.Exit(1)
@@ -133,8 +136,12 @@ func main() {
 
         if event.Code == evdev.KEY_ENTER {
           fmt.Printf("QR code is complete: %d\n", *code)
-          validator := ValidatorData{validationUrl: *validationUrl, code: *code}
-          validator.validateQrCode(*validationUrl, code)
+          v := ValidatorData{validationUrl: *validationUrl, code: *code}
+          validator = v
+
+          if validator.isValidationNeeded(*validationUrl) {
+            validator.validateQrCode(*validationUrl, code)
+          }
           code = nil
         }
       }

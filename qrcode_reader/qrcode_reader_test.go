@@ -35,10 +35,19 @@ func TestAddDigit(t *testing.T) {
 }
 
 func TestIsValidationNeeded(t *testing.T) {
-  if isValidationNeeded("") { t.Fail() }
+  var validater Validater
+  v := ValidatorData{validationUrl: "test", code: 12345}
+  validater = v
+
+  if validater.isValidationNeeded("") { t.Fail() }
 }
 
 func TestGetValidationLink(t *testing.T) {
   var code *uint64 = func(val uint64) *uint64 { return &val }(12345)
-  if getValidationLink("url", code) != "url/12345" { t.Fail() }
+
+  var validater Validater
+  v := ValidatorData{validationUrl: "test", code: *code}
+  validater = v
+
+  if validater.getValidationLink("url", code) != "url/12345" { t.Fail() }
 }
