@@ -63,8 +63,8 @@ func addDigit(code *uint64, digit uint64) *uint64 {
 
 type Validater interface {
   isValidationNeeded() bool
-  getValidationLink(validationUrl string, code *uint64) string
-  validateQrCode(validationUrl string, code *uint64) bool
+  getValidationLink() string
+  validateQrCode() bool
 }
 
 type ValidatorData struct {
@@ -80,13 +80,13 @@ func (d ValidatorData) isValidationNeeded() bool {
   return true
 }
 
-func (d ValidatorData) getValidationLink(validationUrl string, code *uint64) string {
-  return fmt.Sprintf("%s/%d", validationUrl, *code)
+func (d ValidatorData) getValidationLink() string {
+  return fmt.Sprintf("%s/%d", d.validationUrl, d.code)
 }
 
-func (d ValidatorData) validateQrCode(validationUrl string, code *uint64) bool {
+func (d ValidatorData) validateQrCode() bool {
   fmt.Printf("validate qr code\n")
-  validationUrl = d.getValidationLink(validationUrl, code)
+  validationUrl := d.getValidationLink()
   resp, err := http.Get(validationUrl)
 
   if err != nil {
@@ -140,7 +140,7 @@ func main() {
           validator = v
 
           if validator.isValidationNeeded() {
-            validator.validateQrCode(*validationUrl, code)
+            validator.validateQrCode()
           }
           code = nil
         }

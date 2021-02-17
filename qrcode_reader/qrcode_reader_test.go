@@ -46,8 +46,8 @@ func TestGetValidationLink(t *testing.T) {
   var code *uint64 = func(val uint64) *uint64 { return &val }(12345)
 
   var validater Validater
-  v := ValidatorData{validationUrl: "test", code: *code}
+  v := ValidatorData{validationUrl: "url", code: *code}
   validater = v
 
-  if validater.getValidationLink("url", code) != "url/12345" { t.Fail() }
+  if validater.getValidationLink() != "url/12345" { t.Fail() }
 }
