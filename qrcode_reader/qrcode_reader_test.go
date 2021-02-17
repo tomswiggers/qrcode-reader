@@ -36,10 +36,10 @@ func TestAddDigit(t *testing.T) {
 
 func TestIsValidationNeeded(t *testing.T) {
   var validater Validater
-  v := ValidatorData{validationUrl: "test", code: 12345}
+  v := ValidatorData{validationUrl: "", code: 12345}
   validater = v
 
-  if validater.isValidationNeeded("") { t.Fail() }
+  if validater.isValidationNeeded() { t.Fail() }
 }
 
 func TestGetValidationLink(t *testing.T) {
