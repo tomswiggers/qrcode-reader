@@ -7,6 +7,7 @@ import (
 
 func TestGetChar(t *testing.T) {
   if getChar(evdev.KEY_1) != "1" { t.Fail() }
+  if getChar(evdev.KEY_A) != "a" { t.Fail() }
 }
 
 func TestIsKeyDownEvent(t *testing.T) {
