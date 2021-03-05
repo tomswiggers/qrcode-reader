@@ -38,23 +38,6 @@ func isKeyEventNumeric(code uint16) bool {
   return false
 }
 
-func getDigit(code uint16) uint64 {
-  var digits = map[uint16]uint64 {
-    evdev.KEY_1 : 1,
-    evdev.KEY_2 : 2,
-    evdev.KEY_3 : 3,
-    evdev.KEY_4 : 4,
-    evdev.KEY_5 : 5,
-    evdev.KEY_6 : 6,
-    evdev.KEY_7 : 7,
-    evdev.KEY_8 : 8,
-    evdev.KEY_9 : 9,
-    evdev.KEY_0 : 0,
-  }
-
-  return digits[code]
-}
-
 func getChar(code uint16) string {
   var chars = map[uint16]string {
     evdev.KEY_1 : "1",
@@ -67,21 +50,20 @@ func getChar(code uint16) string {
     evdev.KEY_8 : "8",
     evdev.KEY_9 : "9",
     evdev.KEY_0 : "0",
+    evdev.KEY_A : "a",
+    evdev.KEY_B : "b",
+    evdev.KEY_C : "c",
+    evdev.KEY_D : "d",
+    evdev.KEY_E : "e",
+    evdev.KEY_F : "f",
+    evdev.KEY_G : "g",
+    evdev.KEY_H : "h",
+    evdev.KEY_I : "i",
+    evdev.KEY_J : "j",
+    evdev.KEY_K : "k",
   }
 
   return chars[code]
-}
-
-func addDigit(code *uint64, digit uint64) *uint64 {
-
-  if code == nil {
-    code = &digit
-  } else {
-    *code = *code * 10
-    *code = *code + digit
-  }
-
-  return code
 }
 
 func addChar(code *string, digit string) *string {

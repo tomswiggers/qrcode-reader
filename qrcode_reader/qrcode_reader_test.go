@@ -27,14 +27,6 @@ func TestIsKeyEventNumeric(t *testing.T) {
   if !isKeyEventNumeric(evdev.KEY_0) { t.Fail() }
 }
 
-func TestAddDigit(t *testing.T) {
-  var code *uint64
-
-  code = addDigit(code, 1)
-  if *code != 1 { t.Fail() }
-  if *addDigit(code, 1) != 11 { t.Fail() }
-}
-
 func TestIsValidationNeeded(t *testing.T) {
   var validater Validater
   v := ValidatorData{validationUrl: "", code: "12345"}
