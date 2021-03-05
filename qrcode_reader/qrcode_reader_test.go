@@ -5,8 +5,8 @@ import (
   evdev "github.com/gvalkov/golang-evdev"
 )
 
-func TestGetDigit(t *testing.T) {
-  if getDigit(evdev.KEY_1) != 1 { t.Fail() }
+func TestGetChar(t *testing.T) {
+  if getChar(evdev.KEY_1) != "1" { t.Fail() }
 }
 
 func TestIsKeyDownEvent(t *testing.T) {
@@ -36,17 +36,18 @@ func TestAddDigit(t *testing.T) {
 
 func TestIsValidationNeeded(t *testing.T) {
   var validater Validater
-  v := ValidatorData{validationUrl: "", code: 12345}
+  v := ValidatorData{validationUrl: "", code: "12345"}
   validater = v
 
   if validater.isValidationNeeded() { t.Fail() }
 }
 
 func TestGetValidationLink(t *testing.T) {
-  var code *uint64 = func(val uint64) *uint64 { return &val }(12345)
+  var code string
+  code = "12345"
 
   var validater Validater
-  v := ValidatorData{validationUrl: "url", code: *code}
+  v := ValidatorData{validationUrl: "url", code: code}
   validater = v
 
   if validater.getValidationLink() != "url/12345" { t.Fail() }
