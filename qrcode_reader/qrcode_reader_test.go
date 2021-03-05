@@ -10,8 +10,36 @@ func TestGetChar(t *testing.T) {
   if getChar(evdev.KEY_A) != "a" { t.Fail() }
 }
 
+func TestAddChar(t *testing.T) {
+  var code *string
+
+  code = addChar(code, "a", false)
+  if *code != "a" { t.Fail() }
+
+  code = addChar(code, "a", true)
+  if *code != "aA" { t.Fail() }
+
+  code = addChar(code, "1", true)
+  if *code != "aA1" { t.Fail() }
+
+  code = addChar(code, "=", true)
+  if *code != "aA1=" { t.Fail() }
+
+  code = addChar(code, "/", true)
+  if *code != "aA1=/" { t.Fail() }
+}
+
+func TestIsKeyUpperCase(t *testing.T) {
+  if !isKeyUpperCase(evdev.KEY_LEFTSHIFT) { t.Fail() }
+  if !isKeyUpperCase(evdev.KEY_RIGHTSHIFT) { t.Fail() }
+}
+
 func TestIsKeyDownEvent(t *testing.T) {
   if !isKeyDownEvent(evdev.EV_KEY, 0) { t.Fail() }
+}
+
+func TestIsTerminationKey(t *testing.T) {
+  if !isTerminationKey(evdev.KEY_ENTER) { t.Fail() }
 }
 
 func TestIsKeyEventNumeric(t *testing.T) {

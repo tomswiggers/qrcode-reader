@@ -6,6 +6,7 @@ import (
   "net/http"
   "log"
 	"os"
+  "strings"
 	evdev "github.com/gvalkov/golang-evdev"
 )
 
@@ -38,6 +39,22 @@ func isKeyEventNumeric(code uint16) bool {
   return false
 }
 
+func isKeyUpperCase(code uint16) bool {
+  if code == evdev.KEY_LEFTSHIFT || code == evdev.KEY_RIGHTSHIFT {
+    return true
+  }
+
+  return false
+}
+
+func isTerminationKey(code uint16) bool {
+  if code == evdev.KEY_ENTER {
+    return true
+  }
+
+  return false
+}
+
 func getChar(code uint16) string {
   var chars = map[uint16]string {
     evdev.KEY_1 : "1",
@@ -61,22 +78,43 @@ func getChar(code uint16) string {
     evdev.KEY_I : "i",
     evdev.KEY_J : "j",
     evdev.KEY_K : "k",
+    evdev.KEY_L : "l",
+    evdev.KEY_N : "n",
+    evdev.KEY_M : "m",
+    evdev.KEY_O : "o",
+    evdev.KEY_P : "p",
+    evdev.KEY_Q : "q",
+    evdev.KEY_R : "r",
+    evdev.KEY_S : "s",
+    evdev.KEY_T : "t",
+    evdev.KEY_U : "u",
+    evdev.KEY_V : "v",
+    evdev.KEY_W : "w",
+    evdev.KEY_X : "x",
+    evdev.KEY_Y : "y",
+    evdev.KEY_Z : "z",
+    evdev.KEY_SLASH : "/",
+    evdev.KEY_EQUAL : "=",
+    evdev.KEY_KPPLUS : "+",
   }
 
   return chars[code]
 }
 
-func addChar(code *string, digit string) *string {
+func addChar(code *string, char string, upper bool) *string {
+
+  if upper {
+    char = strings.ToUpper(char)
+  }
 
   if code == nil {
-    code = &digit
+    code = &char
   } else {
-    *code += digit
+    *code += char
   }
 
   return code
 }
-
 
 type Validater interface {
   isValidationNeeded() bool
@@ -127,6 +165,7 @@ func main() {
   var code *string
   var key string
   var validator Validater
+  var upper bool
 
 	if !evdev.IsInputDevice(*path) {
 		os.Exit(1)
@@ -150,12 +189,11 @@ func main() {
     for _, event := range events {
       if isKeyDownEvent(event.Type, event.Value) {
 
-        if isKeyEventNumeric(event.Code) {
-          key = getChar(event.Code)
-          code = addChar(code, key)
-        }
+        key = getChar(event.Code)
+        code = addChar(code, key, upper)
+        upper = isKeyUpperCase(event.Code)
 
-        if event.Code == evdev.KEY_ENTER {
+        if isTerminationKey(event.Code) {
           fmt.Printf("QR code is complete: %s\n", *code)
           v := ValidatorData{validationUrl: *validationUrl, code: *code}
           validator = v
