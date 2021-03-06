@@ -38,6 +38,10 @@ func TestIsKeyDownEvent(t *testing.T) {
   if !isKeyDownEvent(evdev.EV_KEY, 0) { t.Fail() }
 }
 
+func TestIsKeyUpEvent(t *testing.T) {
+  if !isKeyUpEvent(evdev.EV_KEY, 1) { t.Fail() }
+}
+
 func TestIsTerminationKey(t *testing.T) {
   if !isTerminationKey(evdev.KEY_ENTER) { t.Fail() }
 }

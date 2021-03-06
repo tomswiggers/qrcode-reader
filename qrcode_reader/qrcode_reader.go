@@ -22,9 +22,16 @@ type EventDevice struct {
   path string
 }
 
-
 func isKeyDownEvent(eventType uint16, eventValue int32) bool {
   if eventType == evdev.EV_KEY && eventValue == 0 {
+    return true
+  }
+
+  return false
+}
+
+func isKeyUpEvent(eventType uint16, eventValue int32) bool {
+  if eventType == evdev.EV_KEY && eventValue == 1 {
     return true
   }
 
@@ -187,7 +194,9 @@ func main() {
 			os.Exit(1)
 		}
     for _, event := range events {
-      if isKeyDownEvent(event.Type, event.Value) {
+      if isKeyUpEvent(event.Type, event.Value) {
+
+        fmt.Printf("%d\n", event.Code)
 
         key = getChar(event.Code)
         code = addChar(code, key, upper)
