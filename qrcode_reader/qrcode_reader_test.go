@@ -46,6 +46,18 @@ func TestIsTerminationKey(t *testing.T) {
   if !isTerminationKey(evdev.KEY_ENTER) { t.Fail() }
 }
 
+func TestIsSkippingNeeded(t *testing.T) {
+  if isSkippingNeeded(0) { t.Fail() }
+  if !isSkippingNeeded(1) { t.Fail() }
+  if !isSkippingNeeded(2) { t.Fail() }
+  if !isSkippingNeeded(3) { t.Fail() }
+  if !isSkippingNeeded(4) { t.Fail() }
+  if !isSkippingNeeded(5) { t.Fail() }
+  if !isSkippingNeeded(6) { t.Fail() }
+  if !isSkippingNeeded(7) { t.Fail() }
+  if isSkippingNeeded(8) { t.Fail() }
+}
+
 func TestIsKeyEventNumeric(t *testing.T) {
   if !isKeyEventNumeric(evdev.KEY_1) { t.Fail() }
   if !isKeyEventNumeric(evdev.KEY_2) { t.Fail() }
@@ -72,7 +84,7 @@ func TestGetValidationLink(t *testing.T) {
   code = "12345"
 
   var validater Validater
-  v := ValidatorData{validationUrl: "url", code: code}
+  v := ValidatorData{validationUrl: "url/%s", code: code}
   validater = v
 
   if validater.getValidationLink() != "url/12345" { t.Fail() }

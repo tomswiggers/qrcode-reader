@@ -62,6 +62,22 @@ func isTerminationKey(code uint16) bool {
   return false
 }
 
+func isBackSlashKey(code uint16) bool {
+  if code == evdev.KEY_BACKSLASH {
+    return true
+  }
+
+  return false
+}
+
+func isSkippingNeeded(i uint8) bool {
+  if i > 0 && i < 8 {
+    return true
+  }
+
+  return false
+}
+
 func getChar(code uint16) string {
   var chars = map[uint16]string {
     evdev.KEY_1 : "1",
@@ -143,7 +159,7 @@ func (d ValidatorData) isValidationNeeded() bool {
 }
 
 func (d ValidatorData) getValidationLink() string {
-  return fmt.Sprintf("%s/%s", d.validationUrl, d.code)
+  return fmt.Sprintf(d.validationUrl, d.code)
 }
 
 func (d ValidatorData) validateQrCode() bool {
@@ -173,6 +189,9 @@ func main() {
   var key string
   var validator Validater
   var upper bool
+  var eciSkipper uint8
+
+  eciSkipper = 0
 
 	if !evdev.IsInputDevice(*path) {
 		os.Exit(1)
@@ -196,11 +215,19 @@ func main() {
     for _, event := range events {
       if isKeyUpEvent(event.Type, event.Value) {
 
-        fmt.Printf("%d\n", event.Code)
+        fmt.Printf("[%d] type = [%d] value = [%d]\n", event.Code, event.Type, event.Value)
+        if isBackSlashKey(event.Code) {
+          eciSkipper = 1
+        }
 
-        key = getChar(event.Code)
-        code = addChar(code, key, upper)
-        upper = isKeyUpperCase(event.Code)
+        if isSkippingNeeded(eciSkipper) {
+          eciSkipper++
+        } else {
+          eciSkipper = 0
+          key = getChar(event.Code)
+          code = addChar(code, key, upper)
+          upper = isKeyUpperCase(event.Code)
+        }
 
         if isTerminationKey(event.Code) {
           fmt.Printf("QR code is complete: %s\n", *code)
